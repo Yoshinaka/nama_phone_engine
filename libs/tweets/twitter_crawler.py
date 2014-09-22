@@ -5,44 +5,9 @@ import t_key
 import oauth2 as oauth
 import pprint
 import json, urllib2
-
-
-# class TwitterCrawler(threading.Thread):
-#     
-#     def __init__(self):
-#         #super().__init__()
-#         self.interval = 30
-#         self.tweet_point = 0
-#        # Keys for twitter oauth2 api
-#         self.CK = t_key.dict['cons_key']
-#         self.CS = t_key.dict['cons_sec']
-#         self.AT = t_key.dict['acc_token']
-#         self.AS = t_key.dict['acc_sec']
-#         self.twitter_settings()
-# 
-#     def twitter_settings(self):
-#         self.consumer = oauth.Consumer(key=self.CK, secret=self.CS)
-#         self.token = oauth.Token(key=self.AT, secret=self.AS)
-#         self.url = 'https://api.twitter.com/1.1/search/tweets.json'
-#         self.params = {'q': "@Vermee81"}
-# 
-#     def handle_crawl(self, tweet_point):
-#         request = oauth.Request.from_consumer_and_token(self.consumer,
-#                 self.token, http_url=self.url,parameters=self.params)
-#         request.sign_request(oauth.SignatureMethod_HMAC_SHA1(), self.consumer,
-#                 self.token)
-#         res = urllib2.urlopen(request.to_url())
-#         
-#         for r in res:
-#             data = json.loads(r)
-#             
-#         pprint.pprint(data)
-#         return 2, 33
+import random
 
 def get_tweets():
-
-    t = threading.Timer(5, get_tweets)
-    t.start()
 
     CK = t_key.dict['cons_key']
     CS = t_key.dict['cons_sec']
@@ -69,11 +34,36 @@ def get_tweets():
 
     print value_list
 
+    time.sleep(30)
+
+
     #pprint.pprint(data)
     #print data('search_metadata')
 
 
+class TwitterThread(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.interval = 30
+
+    def run(self):
+        counter = 0
+        while 1:
+            print "get tweets"
+            print counter
+            counter += 1
+            print random.randint(1, 10)
+            time.sleep(self.interval)
+
+    def dummy_tweets(self):
+        tweet_num = random.randint(1, 10)
+        return tweet_num
+
 if __name__ == '__main__':
-    twitter_thread = threading.Thread(target=get_tweets)
-    twitter_thread.start()
+    #twitter_thread = threading.Thread(target=get_tweets)
+    #twitter_thread = threading.Thread(target=test_print)
+    #twitter_thread.start()
+
+    tweet_crawl = TwitterThread()
+    tweet_crawl.start()
 
