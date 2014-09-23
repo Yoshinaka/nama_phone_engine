@@ -13,11 +13,16 @@ import ConfigParser
 def get_tweets():
 
     conf = ConfigParser.SafeConfigParser()
-    conf.read(ignore_twitter_keys.py)
-    print conf.get('twitterkeys', 'CK')
-    print conf.get('twitterkeys', 'CS')
-    print conf.get('twitterkeys', 'AT')
-    print conf.get('twitterkeys', 'AS')
+    conf.read('ignore_twitter_keys.py')
+#    print conf.get('twitterkeys', 'CK')
+#    print conf.get('twitterkeys', 'CS')
+#    print conf.get('twitterkeys', 'AT')
+#    print conf.get('twitterkeys', 'AS')
+
+    CK = conf.get('twitterkeys', 'CK')
+    CS = conf.get('twitterkeys', 'CS')
+    AT = conf.get('twitterkeys', 'AT')
+    AS = conf.get('twitterkeys', 'AS')
 
 #    CK = t_key.dict['cons_key']
 #    CS = t_key.dict['cons_sec']
