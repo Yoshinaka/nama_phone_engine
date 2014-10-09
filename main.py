@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
-import threading
 import time
-#from libs.gpio import gpio
-from libs.tweets import twitter_crawler
-from libs.fuel import fuel
+# from libs.gpio import gpio
+# from libs.tweets import twitter_crawler
+# from libs.fuel import fuel
 import fuel_charger
 from libs.gpio import dummy_gpio
 
 status = "OFF"
+
+
+def change_gpio_state(my_gpio, power_time):
+    if power_time > 0 and my_gpio.state == 'OFF':
+        my_gpio.on()
+    if power_time == 0 and my_gpio.state == 'ON':
+        my_gpio.off()
 
 
 def main():
@@ -20,7 +26,7 @@ def main():
     power_time = 0
 
     # Last tweet number we took.
-    tweet_num = 0
+    # tweet_num = 0
 
     # 別スレッドで30秒間隔でツイッターのツイート数を監視して
     # fuel_tankに燃料を供給する。
@@ -32,10 +38,7 @@ def main():
 
     while 1:
 
-        if power_time > 0 and my_gpio.state == 'OFF':
-            my_gpio.on()
-        if power_time == 0 and my_gpio.state == 'ON':
-            my_gpio.off()
+        change_gpio_state(my_gpio, power_time)
 
         # 燃料供給
         power_time += fuel_tank.give_fuel()
