@@ -13,7 +13,7 @@ import ConfigParser
 def get_tweets():
 
     conf = ConfigParser.SafeConfigParser()
-    conf.read(ignore_twitter_keys.py)
+    conf.read('ignored_twitter_keys.cfg')
     print conf.get('twitterkeys', 'CK')
     print conf.get('twitterkeys', 'CS')
     print conf.get('twitterkeys', 'AT')
