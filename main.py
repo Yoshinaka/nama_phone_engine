@@ -1,37 +1,46 @@
 # -*- coding: utf-8 -*-
-import threading
+import time
 from libs.gpio import gpio
 from libs.tweets import twitter_crawler
-
-__author__ = 'Vermee81'
+from libs.fuel import fuel
 
 status = "OFF"
 
-# Remaining time that the fan is kept working.
-power_time = 0
+def change_gpio_state(my_gpio, power_time):
+    if power_time > 0 and my_gpio.state == 'OFF':
+        my_gpio.on()
+    if power_time == 0 and my_gpio.state == 'ON':
+        my_gpio.off()
 
-# Last tweet number we took.
-tweet_num = 0
 
 def main():
-    # 決まった間隔で動かす燃料を取得する
-    # 間隔はFuelStandが作成するオブジェクトにおまかせ
-    #fuel_charger = FuelStand()
-    #fuel_charger.start()
+    # Raspberry Piをコントロールするオブジェクトを生成
+    my_gpio = gpio.Gpio()
+    fuel_tank = fuel.Fuel()
 
-    # 30秒間隔でツイッターのツイート数を監視する
+    # Remaining time that the fan is kept working.
+    power_time = 0
+
+    # 一定間隔でツイッターのツイート数を監視する
     # ツイッターを監視するスレッドを生成
-    # fuel_chargerに移動予定
-    twitter_thread = threading.Thread(target=twitter_crawler.get_tweets)
-    twitter_thread.start()
+    tweet_crawl = twitter_crawler.TwitterThread()
+    tweet_crawl.start()
 
-    # ツイッター監視スレッドにチケットを渡して、ツイート数を受け取る
-    #     受け取ったら、最終確認ツイート番号とツイート数を更新
-    # 別スレッドで電気信号を送り込むスレッドを生成
-    # 信号監視スレッドに何時までONにするか指示する
-    mygpio = gpio.Gpio()
-    print mygpio.state
-    # カウンター監視スレッドは1秒間隔で監視してOFFのステータスに変更する
+    fuel_tank = tweet_crawl.fuel_tank
+
+    while 1:
+        change_gpio_state(my_gpio, power_time)
+
+        # 燃料供給
+        power_time += fuel_tank.give_fuel()
+        print "燃料供給後", power_time
+
+        # 毎秒燃料は減っていく
+        power_time -= 1
+        print "燃料減った後", power_time
+
+        time.sleep(1)
+
 
 if __name__ == "__main__":
     main()

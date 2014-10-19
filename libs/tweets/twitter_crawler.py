@@ -1,79 +1,70 @@
 # -*- encoding=utf-8 -*-
 import threading
 import time
-import t_key
 import oauth2 as oauth
 import pprint
 import json, urllib2
+import ConfigParser
+from libs.fuel import fuel
+###import ignore_twitter_keys.py
 
 
-# class TwitterCrawler(threading.Thread):
-#     
-#     def __init__(self):
-#         #super().__init__()
-#         self.interval = 30
-#         self.tweet_point = 0
-#        # Keys for twitter oauth2 api
-#         self.CK = t_key.dict['cons_key']
-#         self.CS = t_key.dict['cons_sec']
-#         self.AT = t_key.dict['acc_token']
-#         self.AS = t_key.dict['acc_sec']
-#         self.twitter_settings()
-# 
-#     def twitter_settings(self):
-#         self.consumer = oauth.Consumer(key=self.CK, secret=self.CS)
-#         self.token = oauth.Token(key=self.AT, secret=self.AS)
-#         self.url = 'https://api.twitter.com/1.1/search/tweets.json'
-#         self.params = {'q': "@Vermee81"}
-# 
-#     def handle_crawl(self, tweet_point):
-#         request = oauth.Request.from_consumer_and_token(self.consumer,
-#                 self.token, http_url=self.url,parameters=self.params)
-#         request.sign_request(oauth.SignatureMethod_HMAC_SHA1(), self.consumer,
-#                 self.token)
-#         res = urllib2.urlopen(request.to_url())
-#         
-#         for r in res:
-#             data = json.loads(r)
-#             
-#         pprint.pprint(data)
-#         return 2, 33
+def get_tweets(fuel_tank = "", since_id = ""):
 
-def get_tweets():
-
-    t = threading.Timer(5, get_tweets)
-    t.start()
-
-    CK = t_key.dict['cons_key']
-    CS = t_key.dict['cons_sec']
-    AT = t_key.dict['acc_token']
-    AS = t_key.dict['acc_sec']
+    conf = ConfigParser.SafeConfigParser()
+    conf.read('ignored_twitter_keys.cfg')
+    CK = conf.get('twitterkeys', 'cons_key')
+    CS =  conf.get('twitterkeys', 'cons_sec')
+    AT = conf.get('twitterkeys', 'acc_token')
+    AS = conf.get('twitterkeys', 'acc_sec')
 
     consumer = oauth.Consumer(key=CK, secret=CS)
     token = oauth.Token(key=AT, secret=AS)
 
+    ACCOUNT = u"@HrksbTest01"
+    COUNT = 100
+
+    query = ACCOUNT.encode('utf-8')
+
     url = 'https://api.twitter.com/1.1/search/tweets.json'
-    params = {'q': "@Vermee81"}
+    params = {'q': query, 'since_id': since_id, 'count': COUNT}
 
     request = oauth.Request.from_consumer_and_token(consumer, token, http_url=url,parameters=params)
     request.sign_request(oauth.SignatureMethod_HMAC_SHA1(), consumer, token)
     res = urllib2.urlopen(request.to_url())
 
-
     for r in res:
         data = json.loads(r)
 
-    value_list = data['search_metadata']['count']
-    for i in range(4):
-        print data['statuses'][i+1]['text']
+    status_list = data['statuses']
+    max_id = data['search_metadata']['max_id_str']
 
-    print value_list
+    if fuel_tank != "" :
+        fuel_tank.add_fuel(len(status_list))
 
+    print len(status_list)
     #pprint.pprint(data)
-    #print data('search_metadata')
 
+    return max_id
+
+
+class TwitterThread(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.fuel_tank = fuel.Fuel()
+        self.INTERVAL = 60
+
+    def run(self):
+        max_id = ""
+        max_id = get_tweets()
+        time.sleep(self.INTERVAL)
+        while 1:
+            counter = 0
+            max_id = get_tweets(self.fuel_tank, max_id)
+            print "FUEL: " + str(self.fuel_tank.fuel)
+            time.sleep(self.INTERVAL)
 
 if __name__ == '__main__':
-    twitter_thread = threading.Thread(target=get_tweets)
-    twitter_thread.start()
+    tweet_crawl = TwitterThread()
+    tweet_crawl.start()
 
