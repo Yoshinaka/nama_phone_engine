@@ -21,7 +21,7 @@ def get_tweets(fuel_tank = "", since_id = ""):
     consumer = oauth.Consumer(key=CK, secret=CS)
     token = oauth.Token(key=AT, secret=AS)
 
-    ACCOUNT = u"@HrksbTest01"
+    ACCOUNT = u"@namaphonebox"
     COUNT = 100
 
     query = ACCOUNT.encode('utf-8')
