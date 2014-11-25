@@ -12,14 +12,11 @@ from libs.gpio import gpio
 from libs.tweets import twitter_crawler
 from libs.fuel import fuel
 
-status = "OFF"
-
 def change_gpio_state(my_gpio, power_time):
-    if power_time > 0 and my_gpio.state == 'OFF':
+    if power_time > 0 :
         my_gpio.on()
-    if power_time == 0 and my_gpio.state == 'ON':
+    elif power_time == 0 :
         my_gpio.off()
-
 
 def main():
     # Raspberry Piをコントロールするオブジェクトを生成
