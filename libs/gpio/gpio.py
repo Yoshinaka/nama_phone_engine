@@ -29,3 +29,6 @@ class Gpio:
             self.state = 'on'
 
 
+if __name__ == '__main__':
+    gpio_obj = Gpio()
+    gpio_obj.off()

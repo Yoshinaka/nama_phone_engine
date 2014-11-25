@@ -1,4 +1,8 @@
 # -*- encoding=utf-8 -*-
+#import sys,os
+#dirpath=os.path.dirname(os.path.abspath(__file__))
+#fuel_dir='../fuel'
+#sys.path.append(dirpath+'/'+fuel_dir)
 import threading
 import time
 import oauth2 as oauth
@@ -12,7 +16,7 @@ from libs.fuel import fuel
 def get_tweets(fuel_tank = "", since_id = ""):
 
     conf = ConfigParser.SafeConfigParser()
-    conf.read('ignored_twitter_keys.cfg')
+    conf.read('/home/pi/nama_phone_engine/libs/tweets/ignored_twitter_keys.cfg')
     CK = conf.get('twitterkeys', 'cons_key')
     CS =  conf.get('twitterkeys', 'cons_sec')
     AT = conf.get('twitterkeys', 'acc_token')
